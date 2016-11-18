@@ -86,7 +86,7 @@ import java.util.List;
 
 @Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
 
-public class ConceptVuforiaNavigation extends LinearOpMode {
+public class VuforiaNavigation extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";
 
@@ -135,16 +135,16 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
          * example "StonesAndChips", datasets can be found in in this project in the
          * documentation directory.
          */
-        VuforiaTrackables stonesAndChips = this.vuforia.loadTrackablesFromAsset("StonesAndChips");
-        VuforiaTrackable redTarget = stonesAndChips.get(0);
-        redTarget.setName("RedTarget");  // Stones
+        VuforiaTrackables proutVuforiaNavigation = this.vuforia.loadTrackablesFromAsset("ProutVuforiaNavigation");
+        VuforiaTrackable redTarget = proutVuforiaNavigation.get(0);
+        redTarget.setName("RedTarget");  //Wheels
 
-        VuforiaTrackable blueTarget  = stonesAndChips.get(1);
-        blueTarget.setName("BlueTarget");  // Chips
+        VuforiaTrackable blueTarget  = proutVuforiaNavigation.get(1);
+        blueTarget.setName("BlueTarget");  // legos
 
         /** For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(stonesAndChips);
+        allTrackables.addAll(proutVuforiaNavigation);
 
         /**
          * We use units of mm here because that's the recommended units of measurement for the
@@ -239,6 +239,7 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
                         AngleUnit.DEGREES, 90, 0, 0));
         blueTarget.setLocation(blueTargetLocationOnField);
         RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
+        OpenGLMatrix.identityMatrix();
 
         /**
          * Create a transformation matrix describing where the phone is on the robot. Here, we
@@ -292,7 +293,7 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
         waitForStart();
 
         /** Start tracking the data sets we care about. */
-        stonesAndChips.activate();
+        proutVuforiaNavigation.activate();
 
         while (opModeIsActive()) {
 

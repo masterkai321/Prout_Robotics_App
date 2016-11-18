@@ -19,16 +19,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 public class HardwareProutBot
 {
-    /* Public OpMode members. */
+    // Public OpMode members.
     public DcMotor  leftMotor   = null;
     public DcMotor  rightMotor  = null;
     public DcMotor  brushMotor  = null;
-    public DcMotor  pitchMotor  = null;
+    public DcMotor  catMotor  = null;
+
     public Servo    tiltServo    = null;
     public Servo    loadServo   = null;
 
     public static final double MID_SERVO       =  0.5 ;
-    public static final double PITCH_POWER    =  1.0 ;
+    public static final double CAT_POWER    =  1.0 ;
     public static final double BRUSH_POWER  = 1.0 ;
 
     /* local OpMode members. */
@@ -49,7 +50,7 @@ public class HardwareProutBot
         leftMotor   = hwMap.dcMotor.get("left_drive");
         rightMotor  = hwMap.dcMotor.get("right_drive");
         brushMotor  = hwMap.dcMotor.get("brush_drive");
-        pitchMotor  = hwMap.dcMotor.get("pitch_drive");
+        catMotor  = hwMap.dcMotor.get("cat_drive");
 
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
@@ -58,20 +59,21 @@ public class HardwareProutBot
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         brushMotor.setPower(0);
-        pitchMotor.setPower(0);
+        catMotor.setPower(0);
+
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         brushMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        pitchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        catMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // Define and initialize ALL installed servos.
+        /* Define and initialize ALL installed servos.
         tiltServo = hwMap.servo.get("tilt_servo");
         loadServo = hwMap.servo.get("load_servo");
         tiltServo.setPosition(MID_SERVO);
-        loadServo.setPosition(MID_SERVO);
+        loadServo.setPosition(MID_SERVO);*/
     }
 
     /***
