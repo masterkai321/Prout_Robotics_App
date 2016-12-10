@@ -35,8 +35,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CompassSensor;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file provides basic Telop driving for a ProutBot robot.
@@ -53,14 +51,15 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="ProutBot: Test", group="ProutBot")
-public class TestOp extends OpMode{
+@TeleOp(name="ProutBot: OmniBot", group="ProutBot")
+@Disabled
+public class ProutBotOmniDrive extends OpMode{
 
     /* Declare OpMode members. */
-    HardwareTests robot       = new HardwareTests(); // use the class created to define a ProutBot's hardware
+    HardwareProutBotOmni robot       = new HardwareProutBotOmni(); // use the class created to define a ProutBot's hardware
                                                          // could also use HardwareProutBotMatrix class.
-    double          servoOffset  = 0.0 ;                  // Servo mid position
-    final double    SERVO_SPEED  = 0.02 ;                 // sets rate to move servo
+    double          tiltOffset  = 0.0 ;                  // Servo mid position
+    final double    TILT_SPEED  = 0.02 ;                 // sets rate to move servo
 
 
     /*
@@ -83,11 +82,6 @@ public class TestOp extends OpMode{
      */
     @Override
     public void init_loop() {
-
-
-
-
-        telemetry.update();
     }
 
     /*
@@ -95,8 +89,6 @@ public class TestOp extends OpMode{
      */
     @Override
     public void start() {
-
-
     }
 
     /*
@@ -104,32 +96,88 @@ public class TestOp extends OpMode{
      */
     @Override
     public void loop() {
-        double joysticky;
 
-        // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        joysticky = -gamepad1.left_stick_y;
-        //robot.testMotor.setPower(joysticky);
+        //Yaw Left
+        while (gamepad1.left_bumper) {
+            robot.YawLeft();
+        }
+        //Yaw Right
+        while (gamepad1.right_bumper) {
+            robot.YawRight();
+        }
+        //Move at 45 Degrees
+        while (gamepad1.dpad_up && gamepad1.dpad_right) {
+            robot.GoNE();
+        }
+        //Move at 135 Degrees
+        while (gamepad1.dpad_up && gamepad1.dpad_left) {
+            robot.GoNW();
+        }
+        //Move at 225 Degrees
+        while (gamepad1.dpad_down && gamepad1.dpad_left) {
+            robot.GoSW();
+        }
+        //Move at 315 Degrees
+        if (gamepad1.dpad_down && gamepad1.dpad_right) {
+            robot.GoSE();
+        }
+        //Move Forward
+        while (gamepad1.dpad_up) {
+            robot.GoForward();
+        }
+        //Move Backward
+        while (gamepad1.dpad_down) {
+            robot.GoBackward();
+        }
+        //Move Right
+        while (gamepad1.dpad_right) {
+            robot.GoRight();
+        }
+        //Move Left
+        while (gamepad1.dpad_left) {
+            robot.GoLeft();
+        }
+        while (gamepad1.a) {
+            robot.ShootParticle();
+        }
 
-        telemetry.addData("Bearing", robot.comp.getDirection());
-        telemetry.addData("String", robot.comp.toString());
+        if (gamepad1.b)
+            robot.brushMotor.setPower(robot.BRUSH_POWER);
+        else
+            robot.brushMotor.setPower(0.0);
+        if (gamepad1.y)
+            robot.pitchMotor.setPower(robot.PITCH_POWER);
+        else
+            robot.pitchMotor.setPower(0.0);
+
+        robot.StopMovement();
 
 
-        /*Use gamepad left & right Bumpers to tilt object tray
+
+
+        /* Use gamepad left & right Bumpers to tilt object tray
         if (gamepad1.right_bumper)
-            servoOffset += SERVO_SPEED;
+            tiltOffset += TILT_SPEED;
         else if (gamepad1.left_bumper)
-            servoOffset -= SERVO_SPEED;
+            tiltOffset -= TILT_SPEED;
 
         // Move tilt servo to new position.
-        //servoOffset = Range.clip(servoOffset, -0.5, 0.5);
-        robot.testServo.setPosition(robot.MID_SERVO + servoOffset);
-
+        tiltOffset = Range.clip(tiltOffset, -0.5, 0.5);
+        robot.tiltServo.setPosition(robot.MID_SERVO + tiltOffset);
+*/
+        // Use gamepad buttons to turn on pitcher (Y)
+        /*if (gamepad1.y)
+            robot.catMotor.setPower(robot.CAT_POWER);
+        else
+            robot.catMotor.setPower(0.0);
+*/
+        //Use gamepad buttons to turn on brush (B)
 
         // Send telemetry message to signify robot running;
-            //telemetry.addData("test servo",  "Offset = %.2f", servoOffset);
-        telemetry.addData("potato",  "%.2f", joysticky);
-        */
-        telemetry.addData("Status", robot.comp.status());
+        //telemetry.addData("pitcher", "%.2f", robot.pitchMotor.getPower())
+        //telemetry.addData("brush", "%.2f", robot.brushMotor.getPower())
+            //telemetry.addData("tilt servo",  "Offset = %.2f", tiltOffset);
+
         updateTelemetry(telemetry);
     }
 

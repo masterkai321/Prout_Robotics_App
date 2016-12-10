@@ -54,7 +54,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="ProutBot: Teleop Tank", group="ProutBot")
+@TeleOp(name="ProutBot: OmniBot", group="ProutBot")
 
 public class ProutBotTeleopTank_Iterative extends OpMode{
 
@@ -63,6 +63,8 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
                                                          // could also use HardwareProutBotMatrix class.
     double          tiltOffset  = 0.0 ;                  // Servo mid position
     final double    TILT_SPEED  = 0.02 ;                 // sets rate to move servo
+    double left;
+    double right;
 
 
     /*
@@ -99,14 +101,26 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
      */
     @Override
     public void loop() {
-        double left;
-        double right;
 
-        // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_stick_y;
-        right = gamepad1.right_stick_y;
-        robot.leftMotor.setPower(left);
-        robot.rightMotor.setPower(right);
+        left = gamepad1.left_stick_x;
+        right = -gamepad1.left_stick_x;
+        robot.rrMotor.setPower(right);
+        robot.rlMotor.setPower(left);
+
+        // Use gamepad buttons to turn on pitcher (Y)
+        if (gamepad1.y)
+            robot.pitchMotor.setPower(robot.PITCH_POWER);
+        else
+            robot.pitchMotor.setPower(0.0);
+
+        //Use gamepad buttons to turn on brush (A)
+        if (gamepad1.a)
+            robot.brushMotor.setPower(robot.BRUSH_POWER);
+        else
+            robot.brushMotor.setPower(0.0);
+
+
+
 
         /* Use gamepad left & right Bumpers to tilt object tray
         if (gamepad1.right_bumper)
@@ -118,24 +132,14 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
         tiltOffset = Range.clip(tiltOffset, -0.5, 0.5);
         robot.tiltServo.setPosition(robot.MID_SERVO + tiltOffset);
 */
-        // Use gamepad buttons to turn on pitcher (Y)
-        if (gamepad1.y)
-            robot.catMotor.setPower(robot.CAT_POWER);
-        else
-            robot.catMotor.setPower(0.0);
 
-        // Use gamepad buttons to turn on brush (B)
-        if (gamepad1.b)
-            robot.brushMotor.setPower(robot.BRUSH_POWER);
-        else
-            robot.brushMotor.setPower(0.0);
+
 
         // Send telemetry message to signify robot running;
         //telemetry.addData("pitcher", "%.2f", robot.pitchMotor.getPower())
         //telemetry.addData("brush", "%.2f", robot.brushMotor.getPower())
-            //telemetry.addData("tilt servo",  "Offset = %.2f", tiltOffset);
-        telemetry.addData("left motor",  "%.2f", left);
-        telemetry.addData("right motor", "%.2f", right);
+        //telemetry.addData("tilt servo",  "Offset = %.2f", tiltOffset);
+
         updateTelemetry(telemetry);
     }
 

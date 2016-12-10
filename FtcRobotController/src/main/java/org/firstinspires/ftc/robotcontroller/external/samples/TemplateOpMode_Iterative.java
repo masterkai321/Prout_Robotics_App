@@ -30,52 +30,62 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CompassSensor;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
- * This file provides basic Telop driving for a ProutBot robot.
- * The code is structured as an Iterative OpMode
+ * This file contains an example of an iterative (Non-Linear) "OpMode".
+ * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
+ * The names of OpModes appear on the menu of the FTC Driver Station.
+ * When an selection is made from the menu, the corresponding OpMode
+ * class is instantiated on the Robot Controller and executed.
  *
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
- * All device access is managed through the HardwarePushbot class.
- *
- * This particular OpMode executes a basic Tank Drive Teleop for a ProutBot
- * It raises and lowers the tilt using the Gampad Y and A buttons respectively.
- * It also opens and closes the tilts slowly using the left and right Bumper buttons.
+ * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
+ * It includes all the skeletal structure that all iterative OpModes contain.
  *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="ProutBot: Test", group="ProutBot")
-public class TestOp extends OpMode{
-
+@TeleOp(name="Template: Iterative OpMode", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
+@Disabled
+public class TemplateOpMode_Iterative extends OpMode
+{
     /* Declare OpMode members. */
-    HardwareTests robot       = new HardwareTests(); // use the class created to define a ProutBot's hardware
-                                                         // could also use HardwareProutBotMatrix class.
-    double          servoOffset  = 0.0 ;                  // Servo mid position
-    final double    SERVO_SPEED  = 0.02 ;                 // sets rate to move servo
+    private ElapsedTime runtime = new ElapsedTime();
 
+    // private DcMotor leftMotor = null;
+    // private DcMotor rightMotor = null;
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
+        telemetry.addData("Status", "Initialized");
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Driver");    //
-        updateTelemetry(telemetry);
+        /* eg: Initialize the hardware variables. Note that the strings used here as parameters
+         * to 'get' must correspond to the names assigned during the robot configuration
+         * step (using the FTC Robot Controller app on the phone).
+         */
+        // leftMotor  = hardwareMap.dcMotor.get("left motor");
+        // rightMotor = hardwareMap.dcMotor.get("right motor");
+
+        // eg: Set the drive motor directions:
+        // Reverse the motor that runs backwards when connected directly to the battery
+        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        //  rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        // telemetry.addData("Status", "Initialized");
     }
 
     /*
@@ -83,11 +93,6 @@ public class TestOp extends OpMode{
      */
     @Override
     public void init_loop() {
-
-
-
-
-        telemetry.update();
     }
 
     /*
@@ -95,8 +100,7 @@ public class TestOp extends OpMode{
      */
     @Override
     public void start() {
-
-
+        runtime.reset();
     }
 
     /*
@@ -104,33 +108,11 @@ public class TestOp extends OpMode{
      */
     @Override
     public void loop() {
-        double joysticky;
+        telemetry.addData("Status", "Running: " + runtime.toString());
 
-        // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        joysticky = -gamepad1.left_stick_y;
-        //robot.testMotor.setPower(joysticky);
-
-        telemetry.addData("Bearing", robot.comp.getDirection());
-        telemetry.addData("String", robot.comp.toString());
-
-
-        /*Use gamepad left & right Bumpers to tilt object tray
-        if (gamepad1.right_bumper)
-            servoOffset += SERVO_SPEED;
-        else if (gamepad1.left_bumper)
-            servoOffset -= SERVO_SPEED;
-
-        // Move tilt servo to new position.
-        //servoOffset = Range.clip(servoOffset, -0.5, 0.5);
-        robot.testServo.setPosition(robot.MID_SERVO + servoOffset);
-
-
-        // Send telemetry message to signify robot running;
-            //telemetry.addData("test servo",  "Offset = %.2f", servoOffset);
-        telemetry.addData("potato",  "%.2f", joysticky);
-        */
-        telemetry.addData("Status", robot.comp.status());
-        updateTelemetry(telemetry);
+        // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+        // leftMotor.setPower(-gamepad1.left_stick_y);
+        // rightMotor.setPower(-gamepad1.right_stick_y);
     }
 
     /*

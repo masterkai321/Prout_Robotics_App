@@ -30,19 +30,14 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.RobotLog;
-import com.vuforia.EyewearDevice;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -54,11 +49,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.internal.VuforiaPoseMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * This OpMode illustrates the basics of using the Vuforia localizer to determine
@@ -93,91 +86,11 @@ import java.util.Vector;
 
 @Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
 @Disabled
-public class VuforiaNavigation extends LinearOpMode {
+public class ConceptVuforiaNavigation extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";
 
     OpenGLMatrix lastLocation = null;
-
-    int count = 0;
-
-    DcMotor leftDrive;
-    DcMotor rightDrive;
-
-    double stdSpeed = 0.8;
-
-    float mmPerInch        = 25.4f;
-    float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
-    float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
-
-
-
-    double x;
-    double y;
-    double robotBearing;
-
-    double  bearingToTarget;
-
-    float[] robotLocationArray;
-
-    public void GoForward() {
-        leftDrive.setPower(stdSpeed);
-        rightDrive.setPower(stdSpeed);
-    }
-    public void AdjustLeft(float xpos, float ypos) {
-        leftDrive.setPower(stdSpeed/2);
-        rightDrive.setPower(stdSpeed);
-
-    }
-    public void AdjustRight(float xpos, float ypos) {
-        leftDrive.setPower(stdSpeed);
-        rightDrive.setPower(stdSpeed/2);
-    }
-    public void Stahhpp () {
-        leftDrive.setPower(0.0);
-        rightDrive.setPower(0.0);
-    }
-    public void SetHeading(double rheading, double theading, double xpos) {
-        if (xpos > mmFTCFieldWidth/6 + 50) {
-            double desiredHeading = 90 + theading;
-            if (desiredHeading - 5 > rheading) {
-                leftDrive.setPower(0.2);
-                rightDrive.setPower(0.1);
-                telemetry.addLine("adjusting left");
-                if (rheading < desiredHeading+5 || rheading > desiredHeading-5) {
-                    GoForward();
-                }
-
-            }
-        }
-        if (xpos < mmFTCFieldWidth/6 -50) {
-            double desiredHeading = 90 - theading;
-            if (desiredHeading + 5 < rheading) {
-                leftDrive.setPower(0.1);
-                rightDrive.setPower(0.2);
-                telemetry.addLine("adjusting right");
-                if (rheading < desiredHeading+5 || rheading > desiredHeading-5) {
-                    GoForward();
-                }
-            }
-        }
-        if (mmFTCFieldWidth/6 + 50 > x && mmFTCFieldWidth/6 -50 < x) {
-            if (rheading > 95) {
-                leftDrive.setPower(0.0);
-                rightDrive.setPower(0.2);
-
-            }
-            if (rheading < 85) {
-                leftDrive.setPower(0.2);
-                rightDrive.setPower(0.0);
-            }
-            if (rheading > 85 && rheading < 95) {
-                GoForward();
-            }
-        }
-    }
-
-
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -186,16 +99,6 @@ public class VuforiaNavigation extends LinearOpMode {
     VuforiaLocalizer vuforia;
 
     @Override public void runOpMode() throws InterruptedException {
-
-        leftDrive = hardwareMap.dcMotor.get("left drive");
-        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftDrive.setPower(0.0);
-
-        rightDrive = hardwareMap.dcMotor.get("right drive");
-        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setPower(0.0);
         /**
          * Start up Vuforia, telling it the id of the view that we wish to use as the parent for
          * the camera monitor feedback; if no camera monitor feedback is desired, use the parameterless
@@ -220,7 +123,7 @@ public class VuforiaNavigation extends LinearOpMode {
          * {@link Parameters} instance with which you initialize Vuforia.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        parameters.vuforiaLicenseKey = "AbOBiYD/////AAAAGQUelmvVvkpLk4peom4GhApugThiOJzS+2zxCHvFs84cMOKcm3u+Qjjdh6XibERMpxZzeH1M483Xy9JCu/RCJf6C2BBeL05KP8tZdMOvhrpjjFtjxacDARgxBYlyBbbF9wiilcZ23cSDnP6NZdmjsz0oWKaPvrMpCtyFk5nSbkdoK4ifH8pOU9kLUjam65M1Fdj1TV/ke9avtCyTR+iloui/dACvU57HM2V76ZgR9/KGGvJyoXVZRDsvRbQXWoVyQwffEPpUK51zrV7tURFuQfXzo5cKv/4hT5dX79pUUtOIuKS6QQ9ptzZ3ybyVV4ilrCklOHksOG0UMpNt+duLM0tq1R2tnTa7Xy28mC+BDCTE";
+        parameters.vuforiaLicenseKey = "ATsODcD/////AAAAAVw2lR...d45oGpdljdOh5LuFB9nDNfckoxb8COxKSFX";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
@@ -232,16 +135,16 @@ public class VuforiaNavigation extends LinearOpMode {
          * example "StonesAndChips", datasets can be found in in this project in the
          * documentation directory.
          */
-        VuforiaTrackables proutVuforiaNavigation = this.vuforia.loadTrackablesFromAsset("ProutVuforiaNavigation");
-        VuforiaTrackable redTarget = proutVuforiaNavigation.get(0);
-        redTarget.setName("RedTarget");  //Wheels
+        VuforiaTrackables stonesAndChips = this.vuforia.loadTrackablesFromAsset("StonesAndChips");
+        VuforiaTrackable redTarget = stonesAndChips.get(0);
+        redTarget.setName("RedTarget");  // Stones
 
-        VuforiaTrackable blueTarget  = proutVuforiaNavigation.get(1);
-        blueTarget.setName("BlueTarget");  // legos
+        VuforiaTrackable blueTarget  = stonesAndChips.get(1);
+        blueTarget.setName("BlueTarget");  // Chips
 
         /** For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(proutVuforiaNavigation);
+        allTrackables.addAll(stonesAndChips);
 
         /**
          * We use units of mm here because that's the recommended units of measurement for the
@@ -250,10 +153,10 @@ public class VuforiaNavigation extends LinearOpMode {
          * You don't *have to* use mm here, but the units here and the units used in the XML
          * target configuration files *must* correspond for the math to work out correctly.
          */
+        float mmPerInch        = 25.4f;
+        float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
+        float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
 
-
-
-        y = -mmFTCFieldWidth/2;
         /**
          * In order for localization to work, we need to tell the system where each target we
          * wish to use for navigation resides on the field, and we need to specify where on the robot
@@ -313,15 +216,13 @@ public class VuforiaNavigation extends LinearOpMode {
         OpenGLMatrix redTargetLocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the RED WALL. Our translation here
                 is a negative translation in X.*/
-                .translation(-mmFTCFieldWidth/2, -mmFTCFieldWidth/6, 0)
+                .translation(-mmFTCFieldWidth/2, 0, 0)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 90, 0));
         redTarget.setLocation(redTargetLocationOnField);
         RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
-
-
 
        /*
         * To place the Stones Target on the Blue Audience wall:
@@ -331,14 +232,13 @@ public class VuforiaNavigation extends LinearOpMode {
         OpenGLMatrix blueTargetLocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the Blue Audience wall.
                 Our translation here is a positive translation in Y.*/
-                .translation(mmFTCFieldWidth/6, mmFTCFieldWidth/2, 0)
+                .translation(0, mmFTCFieldWidth/2, 0)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 0, 0));
         blueTarget.setLocation(blueTargetLocationOnField);
         RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
-        OpenGLMatrix.identityMatrix();
 
         /**
          * Create a transformation matrix describing where the phone is on the robot. Here, we
@@ -353,9 +253,9 @@ public class VuforiaNavigation extends LinearOpMode {
          * plane) is then CCW, as one would normally expect from the usual classic 2D geometry.
          */
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(0,mmBotWidth/6,0)
+                .translation(mmBotWidth/2,0,0)
                 .multiplied(Orientation.getRotationMatrix(
-                        AxesReference.EXTRINSIC, AxesOrder.YXY,
+                        AxesReference.EXTRINSIC, AxesOrder.YZY,
                         AngleUnit.DEGREES, -90, 0, 0));
         RobotLog.ii(TAG, "phone=%s", format(phoneLocationOnRobot));
 
@@ -387,17 +287,14 @@ public class VuforiaNavigation extends LinearOpMode {
          */
 
         /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start tracking lol");
+        telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
         waitForStart();
 
-
         /** Start tracking the data sets we care about. */
-        proutVuforiaNavigation.activate();
+        stonesAndChips.activate();
 
         while (opModeIsActive()) {
-
-
 
             for (VuforiaTrackable trackable : allTrackables) {
                 /**
@@ -410,61 +307,17 @@ public class VuforiaNavigation extends LinearOpMode {
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                 if (robotLocationTransform != null) {
                     lastLocation = robotLocationTransform;
-
-                    Orientation rot = Orientation.getOrientation(lastLocation, AxesReference.EXTRINSIC,AxesOrder.XYZ, AngleUnit.DEGREES);
-                    robotBearing = rot.thirdAngle;
-                    if (robotBearing < 0) {
-                        robotBearing = 360 + robotBearing;
-                    }
-
-                    robotLocationArray = robotLocationTransform.getData();
-                    x = robotLocationArray[12];
-                    y = robotLocationArray[13];
-
-                    double diffx = Math.abs(mmFTCFieldWidth/6 - x);
-                    double diffy = Math.abs(mmFTCFieldWidth/2 -y);
-
-                    double hyp = Math.sqrt(diffx*diffx + diffy*diffy);
-                    bearingToTarget = Math.asin(diffx / hyp);
-                    bearingToTarget = Math.toDegrees(bearingToTarget);
-
-                    double h1 = robotLocationArray[5];
-                    double h2 = robotLocationArray[4];
-
-
-
                 }
             }
-
-            if (x != mmFTCFieldWidth/6) {
-                SetHeading(robotBearing, bearingToTarget, x);
-            }
-            /*if (x < mmFTCFieldWidth/6 +5 && x > mmFTCFieldWidth/6 - 5 ) {
-                GoForward();
-            }*/
-
+            /**
+             * Provide feedback as to where the robot was last located (if we know).
+             */
             if (lastLocation != null) {
-                //RobotLog.vv(TAG, "robot=%s", format(lastLocation));
-                //telemetry.addData("Pos", lastLocation);
-
-                telemetry.addData("x", x);
-                telemetry.addData("tx", mmFTCFieldWidth/6);
-                //telemetry.addData("y", y);
-                //telemetry.addData("bearing", robotBearing);
-                //telemetry.addData("Target Dir", bearingToTarget);
-
+                //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
+                telemetry.addData("Pos", format(lastLocation));
             } else {
                 telemetry.addData("Pos", "Unknown");
-
             }
-/*
-            OpenGLMatrix invLoc = lastLocation.inverted();
-            OpenGLMatrix posLoc = invLoc.transposed();
-
-            float locX = posLoc.get(0,0);
-            telemetry.addData("Loc", format(posLoc));
-            */
-
             telemetry.update();
             idle();
         }

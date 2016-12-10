@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -20,61 +24,96 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HardwareProutBot
 {
     // Public OpMode members.
-    public DcMotor  leftMotor   = null;
-    public DcMotor  rightMotor  = null;
-    public DcMotor  brushMotor  = null;
-    public DcMotor  catMotor  = null;
 
-    public Servo    tiltServo    = null;
-    public Servo    loadServo   = null;
+    public DcMotor  rrMotor = null;
+    public DcMotor  rlMotor = null;
+    public DcMotor  brushMotor  = null;
+    public DcMotor  pitchMotor  = null;
+
+    //public Servo    buttonServo = null;
+    //public Servo    loadServo   = null;
 
     public static final double MID_SERVO       =  0.5 ;
-    public static final double CAT_POWER    =  1.0 ;
-    public static final double BRUSH_POWER  = 1.0 ;
+    public static final double FLY_POWER    =  0.15 ;
+    public static final double BRUSH_POWER  = 1.0;
+    public static final double DRIVE_POWER = 1.0;
+    public static final double PITCH_POWER = 0.15;
+
+    public Double loadDelta = 0.05;
+    public Double loadPosition = 0.5;
+
+
+    LightSensor      llightSensor;                                                          // could also use HardwarePushbotMatrix class.
+    LightSensor      rlightSensor;      // Primary LEGO Light sensor,
+    UltrasonicSensor backDis;
+    UltrasonicSensor frontDis;
+    CompassSensor    compassSensor;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
+    private ElapsedTime timing = new ElapsedTime();
+
+    public void SetHeading(double current, double desired) {
+
+
+    }
+
 
     /* Constructor */
     public HardwareProutBot(){
 
     }
 
+
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap) {
-        // Save reference to Hardware map
-        hwMap = ahwMap;
+        public void init(HardwareMap ahwMap) {
+            // Save reference to Hardware map
+            hwMap = ahwMap;
 
-        // Define and Initialize Motors
-        leftMotor   = hwMap.dcMotor.get("left_drive");
-        rightMotor  = hwMap.dcMotor.get("right_drive");
-        brushMotor  = hwMap.dcMotor.get("brush_drive");
-        catMotor  = hwMap.dcMotor.get("cat_drive");
+            // Define and Initialize Motors
 
-        leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-
-        // Set all motors to zero power
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-        brushMotor.setPower(0);
-        catMotor.setPower(0);
+            rrMotor = hwMap.dcMotor.get("rr");
+            rlMotor = hwMap.dcMotor.get("rl");
+            brushMotor = hwMap.dcMotor.get("brush drive");
+            pitchMotor = hwMap.dcMotor.get("pitch drive");
 
 
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        brushMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        catMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rrMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+            rlMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+            brushMotor.setDirection(DcMotor.Direction.REVERSE);
+            pitchMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        /* Define and initialize ALL installed servos.
-        tiltServo = hwMap.servo.get("tilt_servo");
-        loadServo = hwMap.servo.get("load_servo");
-        tiltServo.setPosition(MID_SERVO);
-        loadServo.setPosition(MID_SERVO);*/
-    }
+
+            // Set all motors to zero power
+
+            rrMotor.setPower(0);
+            rlMotor.setPower(0);
+            brushMotor.setPower(0);
+            pitchMotor.setPower(0);
+
+            llightSensor = hwMap.lightSensor.get("left light");
+            rlightSensor = hwMap.lightSensor.get("right light");
+            backDis = hwMap.ultrasonicSensor.get("back dis");
+            frontDis = hwMap.ultrasonicSensor.get("front dis");
+            compassSensor = hwMap.compassSensor.get("compass");
+
+
+            // Set all motors to run without encoders.
+            // May want to use RUN_USING_ENCODERS if encoders are installed.
+
+            rrMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rlMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            brushMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pitchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            // Define and initialize ALL installed servos.
+            //buttonServo = hwMap.servo.get("tilt_servo");
+            //loadServo = hwMap.servo.get("gate");
+            //buttonServo.setPosition(MID_SERVO);
+            //loadServo.setPosition(MID_SERVO);
+        }
+
 
     /***
      *

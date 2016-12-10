@@ -1,10 +1,28 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.hitechnic.HiTechnicNxtCompassSensor;
+import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.LegacyModule;
+import com.qualcomm.robotcore.hardware.LegacyModulePortDevice;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.LegacyModuleControllerConfiguration;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
+import com.qualcomm.robotcore.hardware.CompassSensor;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.I2cController;
+import com.qualcomm.robotcore.hardware.I2cControllerPortDeviceImpl;
+import com.qualcomm.robotcore.util.TypeConversion;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorHTColor;
+
+import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This is NOT an opmode.
@@ -22,12 +40,16 @@ public class HardwareTests
 {
     // Public OpMode members.
 
-    public DcMotor testMotor = null;
+    //public DcMotor testMotor = null;
 
-        //public Servo testServo    = null;
+    //public Servo testServo    = null;
+
+    public HiTechnicNxtCompassSensor comp = null;
+
 
     public static final double MID_SERVO       =  0.5 ;
     public static final double TEST_POWER  = 1.0 ;
+
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -43,27 +65,25 @@ public class HardwareTests
         // Save reference to Hardware map
         hwMap = ahwMap;
 
-        // Define and Initialize Motors
 
-        testMotor = hwMap.dcMotor.get("test_motor");
+        comp.close();
+
+        /* Define and Initialize Motors
+
+        testMotor = hwMap.dcMotor.get("test motor");
         testMotor.setDirection(DcMotor.Direction.FORWARD);
-        // Set to FORWARD if using AndyMark motors
-
-        // Set all motors to zero power
-
         testMotor.setPower(0);
-
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
-
         testMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
 
         // Define and initialize ALL installed servos.
 
-            //testServo = hwMap.servo.get("test_servo");
+        testServo = hwMap.servo.get("test_servo");
 
-            //testServo.setPosition(MID_SERVO);
+        testServo.setPosition(MID_SERVO);
 
+        */
 
         /***
          *
