@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LegacyModule;
 import com.qualcomm.robotcore.hardware.LegacyModulePortDevice;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.hardware.configuration.LegacyModuleControllerConfiguration;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -44,7 +45,8 @@ public class HardwareTests
 
     //public Servo testServo    = null;
 
-    public HiTechnicNxtCompassSensor comp = null;
+    public UltrasonicSensor distance = null;
+    public CompassSensor comp        = null;
 
 
     public static final double MID_SERVO       =  0.5 ;
@@ -66,7 +68,8 @@ public class HardwareTests
         hwMap = ahwMap;
 
 
-        comp.close();
+        distance = hwMap.ultrasonicSensor.get("front dis");
+        comp = hwMap.compassSensor.get("compass");
 
         /* Define and Initialize Motors
 

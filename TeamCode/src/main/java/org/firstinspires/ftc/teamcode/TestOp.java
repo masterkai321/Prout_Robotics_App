@@ -110,9 +110,8 @@ public class TestOp extends OpMode{
         joysticky = -gamepad1.left_stick_y;
         //robot.testMotor.setPower(joysticky);
 
-        telemetry.addData("Bearing", robot.comp.getDirection());
-        telemetry.addData("String", robot.comp.toString());
-
+        telemetry.addData("Distance from Wall:", robot.distance.getUltrasonicLevel());
+        telemetry.addData("Bearing:", robot.comp.getDirection());
 
         /*Use gamepad left & right Bumpers to tilt object tray
         if (gamepad1.right_bumper)
@@ -129,8 +128,8 @@ public class TestOp extends OpMode{
             //telemetry.addData("test servo",  "Offset = %.2f", servoOffset);
         telemetry.addData("potato",  "%.2f", joysticky);
         */
-        telemetry.addData("Status", robot.comp.status());
-        updateTelemetry(telemetry);
+        telemetry.update();
+
     }
 
     /*

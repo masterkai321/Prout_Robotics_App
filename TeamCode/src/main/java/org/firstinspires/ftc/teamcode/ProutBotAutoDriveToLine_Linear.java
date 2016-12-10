@@ -89,6 +89,7 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
 
         double rdetected = robot.rlightSensor.getLightDetected();
         double ldetected = robot.llightSensor.getLightDetected();
+        
 
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
         // robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -132,15 +133,16 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
             idle();
         }
 
-        //
+        //Aim Towards Beacons and Go Until Line
         robot.SetHeading(robot.compassSensor.getDirection(), 0);
         while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() < 225)) {
 
         }
+        //Adjust onto Line and Follow until specific distance from Wall
         while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 10 || robot.frontDis.getUltrasonicLevel() == 0)) {
 
         }
-
+        //Analyze colors and Press Respective Beacon
         while (opModeIsActive() && (robot.llightSensor.getLightDetected() < WHITE_THRESHOLD)) {
 
             // Display the light level while we are looking for the line
@@ -151,11 +153,15 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
             telemetry.update();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
+        //Turn towards Center Vortex and Go
 
-        // Stop all motors
+
+        //Drive until Ball is moved and Robot is on Center Vortex - Stop
 
         sleep(1000);
         runtime.reset();
+
+
         /*while (opModeIsActive() && ((robot.sideDis.getUltrasonicLevel() > 8) || robot.sideDis.getUltrasonicLevel() == 0.0)) {
             if (rdetected < WHITE_THRESHOLD && ldetected > WHITE_THRESHOLD) {
                 robot.leftMotor.setPower(0.0);

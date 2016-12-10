@@ -38,6 +38,7 @@ public class HardwareProutBot
     public static final double BRUSH_POWER  = 1.0;
     public static final double DRIVE_POWER = 1.0;
     public static final double PITCH_POWER = 0.15;
+    public double initialBearing;
 
     public Double loadDelta = 0.05;
     public Double loadPosition = 0.5;
