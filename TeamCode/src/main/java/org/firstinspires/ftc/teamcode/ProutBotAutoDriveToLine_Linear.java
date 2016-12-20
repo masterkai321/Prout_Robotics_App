@@ -114,26 +114,17 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
         }
 
         // Aim the Robot towards the Vortex and Shoot Twice
-
-        runtime.reset();
         while (opModeIsActive() && (robot.compassSensor.getDirection() < robot.initialBearing + 10)) {
 
-            robot.rlMotor.setPower(robot.DRIVE_POWER);
+            robot.rlMotor.setPower(-robot.DRIVE_POWER);
 
             telemetry.addData("Leg 1: %2.5f Sec Elapsed", runtime.seconds());
             telemetry.update();
             idle();
         }
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 2.0) {
-            robot.ShootParticle();
-            idle();
-        }
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 2.0) {
-            robot.ShootParticle();
-            idle();
-        }
+        robot.rlMotor.setPower(0.0);
+        robot.ShootParticle();
+        robot.ShootParticle();
 
         //Aim Towards Beacons and Go Until Line
         while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 45)) {
@@ -147,6 +138,7 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
         }
 
         //Adjust onto Line and Follow until specific distance from Wall
+        sleep(1000);
         while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 10 || robot.frontDis.getUltrasonicLevel() == 0)) {
             if (rdetected < WHITE_THRESHOLD && ldetected > WHITE_THRESHOLD) {
                 robot.rlMotor.setPower(0.0);

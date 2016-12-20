@@ -103,7 +103,13 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
     public void loop() {
 
         left = gamepad1.left_stick_y;
-        right = gamepad1.right_stick_y;
+        right = gamepad1.left_stick_y;
+
+        if (gamepad1.right_stick_x != 0) {
+            left = gamepad1.left_stick_y - gamepad1.right_stick_x;
+            right = gamepad1.left_stick_y + gamepad1.right_stick_x;
+        }
+
         robot.rrMotor.setPower(right);
         robot.rlMotor.setPower(left);
 
@@ -114,14 +120,18 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
             robot.pitchMotor.setPower(0.0);
 
         //Use gamepad buttons to turn on brush (X)
-        if (gamepad1.x)
+        if (gamepad1.x) {
             robot.brushMotor.setPower(robot.BRUSH_POWER);
-        else
+            robot.loadbrushMotor.setPower(robot.BRUSH_POWER);
+        } else {
             robot.brushMotor.setPower(0.0);
+            robot.loadbrushMotor.setPower(0.0);
+        }
 
-        //Use gamepad buttons to initiate firing sequence (B)
-        if (gamepad1.b)
+        //Use gamepad buttons to initiate firing sequence (Right Bumper)
+        if (gamepad1.right_bumper)
             robot.ShootParticle();
+
 
         updateTelemetry(telemetry);
     }

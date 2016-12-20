@@ -136,6 +136,8 @@ public class HardwareProutBot
             pitchMotor.setPower(0);
             loadbrushMotor.setPower(0);
 
+            //Define and intialize Sensors
+
             llightSensor = hwMap.lightSensor.get("left light");
             rlightSensor = hwMap.lightSensor.get("right light");
             backDis = hwMap.ultrasonicSensor.get("back dis");
