@@ -54,7 +54,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="ProutBot: OmniBot", group="ProutBot")
+@TeleOp(name="ProutBot: TankOp", group="ProutBot")
 
 public class ProutBotTeleopTank_Iterative extends OpMode{
 
@@ -102,8 +102,8 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
     @Override
     public void loop() {
 
-        left = gamepad1.left_stick_x;
-        right = -gamepad1.left_stick_x;
+        left = gamepad1.left_stick_y;
+        right = gamepad1.right_stick_y;
         robot.rrMotor.setPower(right);
         robot.rlMotor.setPower(left);
 
@@ -113,32 +113,15 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
         else
             robot.pitchMotor.setPower(0.0);
 
-        //Use gamepad buttons to turn on brush (A)
-        if (gamepad1.a)
+        //Use gamepad buttons to turn on brush (X)
+        if (gamepad1.x)
             robot.brushMotor.setPower(robot.BRUSH_POWER);
         else
             robot.brushMotor.setPower(0.0);
 
-
-
-
-        /* Use gamepad left & right Bumpers to tilt object tray
-        if (gamepad1.right_bumper)
-            tiltOffset += TILT_SPEED;
-        else if (gamepad1.left_bumper)
-            tiltOffset -= TILT_SPEED;
-
-        // Move tilt servo to new position.
-        tiltOffset = Range.clip(tiltOffset, -0.5, 0.5);
-        robot.tiltServo.setPosition(robot.MID_SERVO + tiltOffset);
-*/
-
-
-
-        // Send telemetry message to signify robot running;
-        //telemetry.addData("pitcher", "%.2f", robot.pitchMotor.getPower())
-        //telemetry.addData("brush", "%.2f", robot.brushMotor.getPower())
-        //telemetry.addData("tilt servo",  "Offset = %.2f", tiltOffset);
+        //Use gamepad buttons to initiate firing sequence (B)
+        if (gamepad1.b)
+            robot.ShootParticle();
 
         updateTelemetry(telemetry);
     }

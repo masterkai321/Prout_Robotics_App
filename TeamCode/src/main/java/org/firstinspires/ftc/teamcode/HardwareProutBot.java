@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -25,23 +29,30 @@ public class HardwareProutBot
 {
     // Public OpMode members.
 
+    // hsvValues is an array that will hold the hue, saturation, and value information.
+    float hsvValues[] = {0F,0F,0F};
+
+    // values is a reference to the hsvValues array.
+    final float values[] = hsvValues;
+
     public DcMotor  rrMotor = null;
     public DcMotor  rlMotor = null;
     public DcMotor  brushMotor  = null;
     public DcMotor  pitchMotor  = null;
+    public DcMotor  loadbrushMotor = null;
 
-    //public Servo    buttonServo = null;
-    //public Servo    loadServo   = null;
+    public Servo    gateServo   = null;
 
-    public static final double MID_SERVO       =  0.5 ;
-    public static final double FLY_POWER    =  0.15 ;
+    public static final double GATE_CLOSED  =  0.5 ;
+    public static final double GATE_OPEN    = 1.0;
     public static final double BRUSH_POWER  = 1.0;
-    public static final double DRIVE_POWER = 1.0;
-    public static final double PITCH_POWER = 0.15;
+    public static final double DRIVE_POWER  = 1.0;
+    public static final double PITCH_POWER  = 0.15;
     public double initialBearing;
+    public double initialtoZero;
 
-    public Double loadDelta = 0.05;
-    public Double loadPosition = 0.5;
+
+
 
 
     LightSensor      llightSensor;                                                          // could also use HardwarePushbotMatrix class.
@@ -49,6 +60,11 @@ public class HardwareProutBot
     UltrasonicSensor backDis;
     UltrasonicSensor frontDis;
     CompassSensor    compassSensor;
+    OpticalDistanceSensor oDis;
+    ColorSensor colorSensor;
+
+
+
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -56,8 +72,32 @@ public class HardwareProutBot
     private ElapsedTime timing = new ElapsedTime();
 
     public void SetHeading(double current, double desired) {
+        if (current > desired) { //Adjust Left
+            while (current > desired) {
+                rrMotor.setPower(0.5);
+                rlMotor.setPower(0.0);
+            }
+        } else if (current < desired) { //Adjust Right
+            while (current < desired) {
+                rrMotor.setPower(0.0);
+                rlMotor.setPower(0.5);
+            }
+        }
+    }
 
-
+    public void ShootParticle() {
+        timing.reset();
+        while (timing.seconds() < 2.0) {
+            pitchMotor.setPower(PITCH_POWER);
+        }
+        timing.reset();
+        while (timing.seconds() < 2.0) {
+            gateServo.setPosition(GATE_OPEN);
+            loadbrushMotor.setPower(BRUSH_POWER);
+        }
+        gateServo.setPosition(GATE_CLOSED);
+        loadbrushMotor.setPower(0.0);
+        pitchMotor.setPower(0.0);
     }
 
 
@@ -78,12 +118,14 @@ public class HardwareProutBot
             rlMotor = hwMap.dcMotor.get("rl");
             brushMotor = hwMap.dcMotor.get("brush drive");
             pitchMotor = hwMap.dcMotor.get("pitch drive");
+            loadbrushMotor = hwMap.dcMotor.get("load drive");
 
 
-            rrMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-            rlMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+            rrMotor.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+            rlMotor.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
             brushMotor.setDirection(DcMotor.Direction.REVERSE);
             pitchMotor.setDirection(DcMotor.Direction.REVERSE);
+            loadbrushMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
             // Set all motors to zero power
@@ -92,12 +134,18 @@ public class HardwareProutBot
             rlMotor.setPower(0);
             brushMotor.setPower(0);
             pitchMotor.setPower(0);
+            loadbrushMotor.setPower(0);
 
             llightSensor = hwMap.lightSensor.get("left light");
             rlightSensor = hwMap.lightSensor.get("right light");
             backDis = hwMap.ultrasonicSensor.get("back dis");
             frontDis = hwMap.ultrasonicSensor.get("front dis");
             compassSensor = hwMap.compassSensor.get("compass");
+            //color = hwMap.colorSensor.get("color");
+            //oDis = hwMap.opticalDistanceSensor.get("ods");
+
+            //colorSensor.enableLed(false);
+            //Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
 
 
             // Set all motors to run without encoders.
@@ -107,12 +155,16 @@ public class HardwareProutBot
             rlMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             brushMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             pitchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            loadbrushMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             // Define and initialize ALL installed servos.
-            //buttonServo = hwMap.servo.get("tilt_servo");
-            //loadServo = hwMap.servo.get("gate");
-            //buttonServo.setPosition(MID_SERVO);
-            //loadServo.setPosition(MID_SERVO);
+
+            gateServo = hwMap.servo.get("gate servo");
+            gateServo.setPosition(GATE_CLOSED);
+
+            initialBearing = compassSensor.getDirection();
+
+
         }
 
 
