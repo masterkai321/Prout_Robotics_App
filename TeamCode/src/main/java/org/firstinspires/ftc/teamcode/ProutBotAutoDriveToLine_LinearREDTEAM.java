@@ -63,9 +63,9 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Pushbot: Auto Drive To Line", group="Pushbot")
+@Autonomous(name="Pushbot: Auto Drive To Line RED", group="Pushbot")
 
-public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
+public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
 
     /* Declare OpMode members. */
     HardwareProutBot         robot   = new HardwareProutBot();   // Use a Pushbot's hardware
@@ -105,7 +105,8 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
             // Display the light level while we are waiting to start
             telemetry.addData("R Light Level", robot.rlightSensor.getLightDetected());
             telemetry.addData("L Light Level", robot.llightSensor.getLightDetected());
-            telemetry.addData("Dis To Wall (Back)", robot.backDis.getUltrasonicLevel());
+            telemetry.addData("Back Distance", robot.backDis.getUltrasonicLevel());
+            telemetry.addData("Front Distance", robot.frontDis.getUltrasonicLevel());
             telemetry.addData("Original Bearing", robot.initialBearing);
             telemetry.addData("Bearing", robot.compassSensor.getDirection());
 
@@ -114,31 +115,60 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
         }
 
         // Aim the Robot towards the Vortex and Shoot Twice
-        while (opModeIsActive() && (robot.compassSensor.getDirection() < robot.initialBearing + 10)) {
+        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 5)) {
 
-            robot.rlMotor.setPower(-robot.DRIVE_POWER);
+            robot.rrMotor.setPower(-robot.DRIVE_POWER);
 
             telemetry.addData("Leg 1: %2.5f Sec Elapsed", runtime.seconds());
+            telemetry.addData("Original Bearing", robot.initialBearing);
+            telemetry.addData("Bearing", robot.compassSensor.getDirection());
             telemetry.update();
             idle();
         }
         robot.rlMotor.setPower(0.0);
-        robot.ShootParticle();
-        robot.ShootParticle();
+        robot.ShootParticle(robot.PITCH_POWER);
+        robot.ShootParticle(robot.PITCH_POWER);
 
         //Aim Towards Beacons and Go Until Line
         while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 45)) {
-            robot.rrMotor.setPower(robot.DRIVE_POWER);
+            robot.rrMotor.setPower(-robot.DRIVE_POWER);
+            telemetry.addData("Original Bearing", robot.initialBearing);
+            telemetry.addData("Bearing", robot.compassSensor.getDirection());
+            telemetry.update();
             idle();
         }
+        robot.rrMotor.setPower(0.0);
         while (opModeIsActive() && (robot.rlightSensor.getLightDetected() < WHITE_THRESHOLD)) {
             robot.rrMotor.setPower(robot.DRIVE_POWER);
             robot.rlMotor.setPower(robot.DRIVE_POWER);
+            telemetry.addData("R Light Level", robot.rlightSensor.getLightDetected());
+            telemetry.update();
             idle();
         }
+        robot.rrMotor.setPower(0.0);
+        robot.rlMotor.setPower(0.0);
 
-        //Adjust onto Line and Follow until specific distance from Wall
-        sleep(1000);
+        //Adjust onto Line towards Beacon
+        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 90)) {
+            robot.rrMotor.setPower(robot.DRIVE_POWER);
+            telemetry.addData("Original Bearing", robot.initialBearing);
+            telemetry.addData("Bearing", robot.compassSensor.getDirection());
+            telemetry.update();
+        }
+        robot.rrMotor.setPower(0.0);
+        robot.rlMotor.setPower(0.0);
+
+        //Go towards Beacon until close
+        while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 10 || robot.frontDis.getUltrasonicLevel() == 0)) {
+            robot.rrMotor.setPower(robot.DRIVE_POWER);
+            robot.rlMotor.setPower(robot.DRIVE_POWER);
+            telemetry.addData("Front Distance", robot.frontDis.getUltrasonicLevel());
+            telemetry.update();
+        }
+        robot.rrMotor.setPower(0.0);
+        robot.rlMotor.setPower(0.0);
+
+        /*
         while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 10 || robot.frontDis.getUltrasonicLevel() == 0)) {
             if (rdetected < WHITE_THRESHOLD && ldetected > WHITE_THRESHOLD) {
                 robot.rlMotor.setPower(0.0);
@@ -154,18 +184,27 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
             }
             idle();
         }
-        //Analyze colors and Press Respective Beacon
-        while (opModeIsActive() && (robot.llightSensor.getLightDetected() < WHITE_THRESHOLD)) {
+        */
 
-            if (robot.colorSensor.red() > robot.colorSensor.blue()) {
-                //Press Red Button
-            } else if (robot.colorSensor.blue() > robot.colorSensor.red()) {
-                //Press Blue Button
-            }
-            // Display the light level while we are looking for the line
+        //Analyze colors and Press Respective Beacon (**Color Sensor is on Right Side**On Red Team**)
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 5) {
+
             telemetry.addData("Red Level",  robot.colorSensor.red());
             telemetry.addData("Blue Level", robot.colorSensor.blue());
             telemetry.addData("Dis To Wall", robot.backDis.getUltrasonicLevel());
+
+            if (robot.colorSensor.red() > robot.colorSensor.blue()) {
+                robot.buttonServo.setPosition(0.0);
+                robot.rrMotor.setPower(robot.DRIVE_POWER);
+                robot.rlMotor.setPower(robot.DRIVE_POWER);
+                //Press Red (Right) Button
+            } else if (robot.colorSensor.blue() > robot.colorSensor.red()) {
+                robot.buttonServo.setPosition(1.0);
+                robot.rlMotor.setPower(robot.DRIVE_POWER);
+                robot.rrMotor.setPower(robot.DRIVE_POWER);
+                //Press Blue (Left) Button
+            }
 
             telemetry.update();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
@@ -173,15 +212,10 @@ public class ProutBotAutoDriveToLine_Linear extends LinearOpMode {
         //Turn towards Center Vortex and Go
 
 
-        //Drive until Ball is moved and Robot is on Center Vortex - Stop
+        //Drive until Ball is moved and Robot is on Center Vortex --> Stop
 
         sleep(1000);
         runtime.reset();
 
-
-        /*while (opModeIsActive() && ((robot.sideDis.getUltrasonicLevel() > 8) || robot.sideDis.getUltrasonicLevel() == 0.0)) {
-
-            idle();
-        }*/
     }
 }

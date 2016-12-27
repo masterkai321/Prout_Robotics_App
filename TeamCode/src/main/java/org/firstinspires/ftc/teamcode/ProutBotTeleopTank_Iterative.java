@@ -113,14 +113,23 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
         robot.rrMotor.setPower(right);
         robot.rlMotor.setPower(left);
 
+        //Adjust Pitch Power with left and right D-Pad
+        if (gamepad1.dpad_left) {
+            robot.PITCH_POWER -= .05;
+        }
+        if (gamepad1.dpad_right) {
+            robot.PITCH_POWER += .05;
+        }
+
+
         // Use gamepad buttons to turn on pitcher (Y)
         if (gamepad1.y)
             robot.pitchMotor.setPower(robot.PITCH_POWER);
         else
             robot.pitchMotor.setPower(0.0);
 
-        //Use gamepad buttons to turn on brush (X)
-        if (gamepad1.x) {
+        //Use gamepad buttons to turn on brush (Left Bumper)
+        if (gamepad1.left_bumper) {
             robot.brushMotor.setPower(robot.BRUSH_POWER);
             robot.loadbrushMotor.setPower(robot.BRUSH_POWER);
         } else {
@@ -128,11 +137,19 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
             robot.loadbrushMotor.setPower(0.0);
         }
 
+        //Use gamepad buttons to move Button Servo to Left Beacon
+        if (gamepad1.x)
+            robot.buttonServo.setPosition(2.0);
+
+        //Use gamepad buttons to move Button Servo to Right Beacon
+        if (gamepad1.b)
+            robot.buttonServo.setPosition(-1.0);
+
         //Use gamepad buttons to initiate firing sequence (Right Bumper)
         if (gamepad1.right_bumper)
-            robot.ShootParticle();
+            robot.ShootParticle(robot.PITCH_POWER);
 
-
+        telemetry.addData("Pitch Power", robot.PITCH_POWER);
         updateTelemetry(telemetry);
     }
 

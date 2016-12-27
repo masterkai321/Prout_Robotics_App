@@ -42,12 +42,13 @@ public class HardwareProutBot
     public DcMotor  loadbrushMotor = null;
 
     public Servo    gateServo   = null;
+    public Servo    buttonServo = null;
 
     public static final double GATE_CLOSED  =  0.5 ;
     public static final double GATE_OPEN    = 1.0;
     public static final double BRUSH_POWER  = 1.0;
     public static final double DRIVE_POWER  = 1.0;
-    public static final double PITCH_POWER  = 0.15;
+    public double PITCH_POWER  = 0.15;
     public double initialBearing;
     public double initialtoZero;
 
@@ -85,13 +86,13 @@ public class HardwareProutBot
         }
     }
 
-    public void ShootParticle() {
+    public void ShootParticle(double power) {
         timing.reset();
         while (timing.seconds() < 2.0) {
-            pitchMotor.setPower(PITCH_POWER);
+            pitchMotor.setPower(power);
         }
         timing.reset();
-        while (timing.seconds() < 2.0) {
+        while (timing.seconds() < 1.0) {
             gateServo.setPosition(GATE_OPEN);
             loadbrushMotor.setPower(BRUSH_POWER);
         }
@@ -163,6 +164,9 @@ public class HardwareProutBot
 
             gateServo = hwMap.servo.get("gate servo");
             gateServo.setPosition(GATE_CLOSED);
+
+            buttonServo = hwMap.servo.get("button servo");
+            buttonServo.setPosition(1.0);
 
             initialBearing = compassSensor.getDirection();
 
