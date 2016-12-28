@@ -65,6 +65,8 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
     final double    TILT_SPEED  = 0.02 ;                 // sets rate to move servo
     double left;
     double right;
+    boolean pitcherIsRunning = false;
+    boolean pitcherIsStopped = true;
 
 
     /*
@@ -121,13 +123,6 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
             robot.PITCH_POWER += .05;
         }
 
-
-        // Use gamepad buttons to turn on pitcher (Y)
-        if (gamepad1.y)
-            robot.pitchMotor.setPower(robot.PITCH_POWER);
-        else
-            robot.pitchMotor.setPower(0.0);
-
         //Use gamepad buttons to turn on brush (Left Bumper)
         if (gamepad1.left_bumper) {
             robot.brushMotor.setPower(robot.BRUSH_POWER);
@@ -137,17 +132,33 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
             robot.loadbrushMotor.setPower(0.0);
         }
 
-        //Use gamepad buttons to move Button Servo to Left Beacon
+        //Use gamepad buttons to move Button Servo to Left Beacon (X)
         if (gamepad1.x)
             robot.buttonServo.setPosition(2.0);
 
-        //Use gamepad buttons to move Button Servo to Right Beacon
+        //Use gamepad buttons to move Button Servo to Right Beacon (B)
         if (gamepad1.b)
             robot.buttonServo.setPosition(-1.0);
 
-        //Use gamepad buttons to initiate firing sequence (Right Bumper)
-        if (gamepad1.right_bumper)
-            robot.ShootParticle(robot.PITCH_POWER);
+        //Use gamepad buttons to initiate toggle Pitch Motor (Right Bumper)
+        if (gamepad1.right_bumper && pitcherIsRunning) {
+            robot.pitchMotor.setPower(0.0);
+            pitcherIsRunning = false;
+            pitcherIsStopped = true;
+        } else if (gamepad1.right_bumper && pitcherIsStopped) {
+            robot.pitchMotor.setPower(robot.PITCH_POWER);
+            pitcherIsRunning = true;
+            pitcherIsStopped = false;
+        }
+
+        //Use gamepad button to load particles into Pitcher (A)
+        if (gamepad1.a) {
+            robot.loadbrushMotor.setPower(robot.BRUSH_POWER);
+            robot.gateServo.setPosition(robot.GATE_OPEN);
+        } else {
+            robot.loadbrushMotor.setPower(0.0);
+            robot.gateServo.setPosition(robot.GATE_CLOSED);
+        }
 
         telemetry.addData("Pitch Power", robot.PITCH_POWER);
         updateTelemetry(telemetry);

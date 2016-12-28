@@ -144,11 +144,11 @@ public class HardwareProutBot
             backDis = hwMap.ultrasonicSensor.get("back dis");
             frontDis = hwMap.ultrasonicSensor.get("front dis");
             compassSensor = hwMap.compassSensor.get("compass");
-            //color = hwMap.colorSensor.get("color");
+            colorSensor = hwMap.colorSensor.get("color");
             //oDis = hwMap.opticalDistanceSensor.get("ods");
 
-            //colorSensor.enableLed(false);
-            //Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
+            colorSensor.enableLed(false);
+            Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
 
 
             // Set all motors to run without encoders.
@@ -166,7 +166,7 @@ public class HardwareProutBot
             gateServo.setPosition(GATE_CLOSED);
 
             buttonServo = hwMap.servo.get("button servo");
-            buttonServo.setPosition(1.0);
+            buttonServo.setPosition(0.0);
 
             initialBearing = compassSensor.getDirection();
 

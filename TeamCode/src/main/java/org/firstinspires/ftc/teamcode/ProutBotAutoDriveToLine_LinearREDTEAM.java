@@ -75,7 +75,7 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
 
 
-    static final double     WHITE_THRESHOLD = 0.215;  // spans between 0.1 - 0.5 from dark to light
+    static final double     WHITE_THRESHOLD = 0.165;  // spans between 0.1 - 0.5 from dark to light
     static final double     APPROACH_SPEED  = -0.5;
 
 
@@ -117,7 +117,7 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
         // Aim the Robot towards the Vortex and Shoot Twice
         while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 5)) {
 
-            robot.rrMotor.setPower(-robot.DRIVE_POWER);
+            robot.rrMotor.setPower(-0.3);
 
             telemetry.addData("Leg 1: %2.5f Sec Elapsed", runtime.seconds());
             telemetry.addData("Original Bearing", robot.initialBearing);
@@ -125,65 +125,55 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
             telemetry.update();
             idle();
         }
+        robot.rrMotor.setPower(0.0);
         robot.rlMotor.setPower(0.0);
         robot.ShootParticle(robot.PITCH_POWER);
         robot.ShootParticle(robot.PITCH_POWER);
 
-        //Aim Towards Beacons and Go Until Line
-        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 45)) {
-            robot.rrMotor.setPower(-robot.DRIVE_POWER);
+        //Aim Towards Beacons
+        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 20)) {
+            robot.rrMotor.setPower(-0.3);
             telemetry.addData("Original Bearing", robot.initialBearing);
             telemetry.addData("Bearing", robot.compassSensor.getDirection());
             telemetry.update();
             idle();
         }
         robot.rrMotor.setPower(0.0);
-        while (opModeIsActive() && (robot.rlightSensor.getLightDetected() < WHITE_THRESHOLD)) {
-            robot.rrMotor.setPower(robot.DRIVE_POWER);
-            robot.rlMotor.setPower(robot.DRIVE_POWER);
-            telemetry.addData("R Light Level", robot.rlightSensor.getLightDetected());
+
+        //Go Until White Line is Found
+        while (opModeIsActive() && (robot.llightSensor.getLightDetected() < WHITE_THRESHOLD)) {
+            robot.rrMotor.setPower(-0.3);
+            robot.rlMotor.setPower(-0.3);
+            telemetry.addData("R Light Level", robot.llightSensor.getLightDetected());
             telemetry.update();
             idle();
         }
         robot.rrMotor.setPower(0.0);
         robot.rlMotor.setPower(0.0);
+        sleep(1000);
 
-        //Adjust onto Line towards Beacon
-        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 90)) {
-            robot.rrMotor.setPower(robot.DRIVE_POWER);
-            telemetry.addData("Original Bearing", robot.initialBearing);
-            telemetry.addData("Bearing", robot.compassSensor.getDirection());
-            telemetry.update();
+        //Adjust onto Line towards Beacon and Move Forward Until Set Distance from beacon
+        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 43)) {
+            robot.rrMotor.setPower(-0.2);
+            robot.rlMotor.setPower(0.2);
+
         }
         robot.rrMotor.setPower(0.0);
         robot.rlMotor.setPower(0.0);
-
-        //Go towards Beacon until close
-        while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 10 || robot.frontDis.getUltrasonicLevel() == 0)) {
-            robot.rrMotor.setPower(robot.DRIVE_POWER);
-            robot.rlMotor.setPower(robot.DRIVE_POWER);
-            telemetry.addData("Front Distance", robot.frontDis.getUltrasonicLevel());
-            telemetry.update();
-        }
-        robot.rrMotor.setPower(0.0);
-        robot.rlMotor.setPower(0.0);
+        sleep(1000);
 
         /*
-        while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 10 || robot.frontDis.getUltrasonicLevel() == 0)) {
-            if (rdetected < WHITE_THRESHOLD && ldetected > WHITE_THRESHOLD) {
-                robot.rlMotor.setPower(0.0);
-                robot.rrMotor.setPower(APPROACH_SPEED);
-            }
-            if (rdetected > WHITE_THRESHOLD && ldetected < WHITE_THRESHOLD) {
-                robot.rlMotor.setPower(APPROACH_SPEED);
-                robot.rrMotor.setPower(0.0);
-            }
-            else {
-                robot.rrMotor.setPower(APPROACH_SPEED);
-                robot.rlMotor.setPower(APPROACH_SPEED);
-            }
+        while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 25 || robot.frontDis.getUltrasonicLevel() == 0)) {
+            robot.rrMotor.setPower(-0.2);
+            robot.rlMotor.setPower(-0.2);
+
+            telemetry.addData("Front Distance", robot.frontDis.getUltrasonicLevel());
+            telemetry.update();
             idle();
         }
+        robot.rrMotor.setPower(0.0);
+        robot.rlMotor.setPower(0.0);
+        sleep(1000);
         */
 
         //Analyze colors and Press Respective Beacon (**Color Sensor is on Right Side**On Red Team**)
@@ -196,13 +186,13 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
 
             if (robot.colorSensor.red() > robot.colorSensor.blue()) {
                 robot.buttonServo.setPosition(0.0);
-                robot.rrMotor.setPower(robot.DRIVE_POWER);
-                robot.rlMotor.setPower(robot.DRIVE_POWER);
+                robot.rrMotor.setPower(-0.2);
+                robot.rlMotor.setPower(-0.2);
                 //Press Red (Right) Button
             } else if (robot.colorSensor.blue() > robot.colorSensor.red()) {
                 robot.buttonServo.setPosition(1.0);
-                robot.rlMotor.setPower(robot.DRIVE_POWER);
-                robot.rrMotor.setPower(robot.DRIVE_POWER);
+                robot.rlMotor.setPower(-0.2);
+                robot.rrMotor.setPower(-0.2);
                 //Press Blue (Left) Button
             }
 
