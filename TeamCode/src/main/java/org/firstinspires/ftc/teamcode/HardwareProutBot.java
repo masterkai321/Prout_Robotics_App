@@ -48,7 +48,9 @@ public class HardwareProutBot
     public static final double GATE_OPEN    = 1.0;
     public static final double BRUSH_POWER  = 1.0;
     public static final double DRIVE_POWER  = 1.0;
-    public double PITCH_POWER  = 0.15;
+    public static final double RIGHT_BUTTON = 0.0;
+    public static final double LEFT_BUTTON = 0.9;
+    public double PITCH_POWER  = 0.10;
     public double initialBearing;
     public double initialtoZero;
 
@@ -58,6 +60,7 @@ public class HardwareProutBot
 
     LightSensor      llightSensor;                                                          // could also use HardwarePushbotMatrix class.
     LightSensor      rlightSensor;      // Primary LEGO Light sensor,
+    LightSensor      clightSensor;
     UltrasonicSensor backDis;
     UltrasonicSensor frontDis;
     CompassSensor    compassSensor;
@@ -86,9 +89,21 @@ public class HardwareProutBot
         }
     }
 
-    public void ShootParticle(double power) {
+    public void ShootParticle(double power, double firstrev, double secondrev) {
         timing.reset();
-        while (timing.seconds() < 2.0) {
+        while (timing.seconds() < firstrev) {
+            pitchMotor.setPower(power);
+        }
+        timing.reset();
+        while (timing.seconds() < 0.7) {
+            gateServo.setPosition(GATE_OPEN);
+            loadbrushMotor.setPower(BRUSH_POWER);
+        }
+        gateServo.setPosition(GATE_CLOSED);
+        loadbrushMotor.setPower(0.0);
+        pitchMotor.setPower(0.0);
+        timing.reset();
+        while (timing.seconds() < secondrev) {
             pitchMotor.setPower(power);
         }
         timing.reset();
@@ -99,6 +114,7 @@ public class HardwareProutBot
         gateServo.setPosition(GATE_CLOSED);
         loadbrushMotor.setPower(0.0);
         pitchMotor.setPower(0.0);
+
     }
 
 
@@ -145,6 +161,7 @@ public class HardwareProutBot
             frontDis = hwMap.ultrasonicSensor.get("front dis");
             compassSensor = hwMap.compassSensor.get("compass");
             colorSensor = hwMap.colorSensor.get("color");
+            clightSensor = hwMap.lightSensor.get("center light");
             //oDis = hwMap.opticalDistanceSensor.get("ods");
 
             colorSensor.enableLed(false);

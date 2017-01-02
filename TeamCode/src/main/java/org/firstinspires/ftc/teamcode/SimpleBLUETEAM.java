@@ -33,15 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CompassSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.LightSensor;
-import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -63,9 +56,9 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ProutBot: Auto Drive To Line RED", group="ProutBot")
+@Autonomous(name="ProutBot: Simple BLUE", group="ProutBot")
 
-public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
+public class SimpleBLUETEAM extends LinearOpMode {
 
     /* Declare OpMode members. */
     HardwareProutBot         robot   = new HardwareProutBot();   // Use a Pushbot's hardware
@@ -74,9 +67,8 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
 
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
 
-    static final double     cWHITE_THRESHOLD = 0.18;
-    static final double     lWhite_THRESHOLD = 0.165;
-    static final double     rWHITE_THRESHOLD = 0.23;
+
+    static final double     rWHITE_THRESHOLD = 0.23;  // spans between 0.1 - 0.5 from dark to light
     static final double     APPROACH_SPEED  = -0.5;
 
 
@@ -90,7 +82,6 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
 
         double rdetected = robot.rlightSensor.getLightDetected();
         double ldetected = robot.llightSensor.getLightDetected();
-        double cdetected = robot.clightSensor.getLightDetected();
 
 
         // turn on LED of light sensor.
@@ -117,10 +108,9 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
         }
 
         // Aim the Robot towards the Vortex and Shoot Twice
-        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 10)) {
+        while (opModeIsActive() && (robot.compassSensor.getDirection() < robot.initialBearing + 10)) {
 
-            robot.rrMotor.setPower(-0.5);
-            robot.rlMotor.setPower(0.1);
+            robot.rlMotor.setPower(-0.5);
 
             telemetry.addData("Leg 1: %2.5f Sec Elapsed", runtime.seconds());
             telemetry.addData("Original Bearing", robot.initialBearing);
@@ -130,86 +120,19 @@ public class ProutBotAutoDriveToLine_LinearREDTEAM extends LinearOpMode {
         }
         robot.rrMotor.setPower(0.0);
         robot.rlMotor.setPower(0.0);
-        robot.ShootParticle(0.12, 4.0, 3.0);
+        robot.ShootParticle(0.13, 4.0, 3.0);
 
-
-        //Aim Towards Beacons
-        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 60)) {
+        //Aim Back Towards center and move to hit ball
+        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing)) {
             robot.rrMotor.setPower(-0.5);
-            robot.rlMotor.setPower(0.5);
-            telemetry.addData("Original Bearing", robot.initialBearing);
-            telemetry.addData("Bearing", robot.compassSensor.getDirection());
-            telemetry.update();
-            idle();
         }
         robot.rrMotor.setPower(0.0);
 
-        //Go Until White Line is Found
-        while (opModeIsActive() && (robot.clightSensor.getLightDetected() < cWHITE_THRESHOLD)) {
-            robot.rrMotor.setPower(-0.3);
-            robot.rlMotor.setPower(-0.3);
-            telemetry.addData("R Light Level", robot.llightSensor.getLightDetected());
-            telemetry.update();
-            idle();
-        }
-        robot.rrMotor.setPower(0.0);
-        robot.rlMotor.setPower(0.0);
-
-        //Adjust onto Line towards Beacon and Move Forward Until Set Distance from beacon
-        while (opModeIsActive() && (robot.compassSensor.getDirection() > robot.initialBearing - 100)) {
-            robot.rrMotor.setPower(-0.4);
-            robot.rlMotor.setPower(0.5);
-
-        }
-        robot.rrMotor.setPower(0.0);
-        robot.rlMotor.setPower(0.0);
-
-
-        /*
-        while (opModeIsActive() && (robot.frontDis.getUltrasonicLevel() > 25 || robot.frontDis.getUltrasonicLevel() == 0)) {
-            robot.rrMotor.setPower(-0.2);
-            robot.rlMotor.setPower(-0.2);
-
-            telemetry.addData("Front Distance", robot.frontDis.getUltrasonicLevel());
-            telemetry.update();
-            idle();
-        }
-        robot.rrMotor.setPower(0.0);
-        robot.rlMotor.setPower(0.0);
-        sleep(1000);
-        */
-
-        //Analyze colors and Press Respective Beacon (**Color Sensor is on Right Side**On Red Team**)
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 10) {
-
-            telemetry.addData("Red Level",  robot.colorSensor.red());
-            telemetry.addData("Blue Level", robot.colorSensor.blue());
-            telemetry.addData("Dis To Wall", robot.backDis.getUltrasonicLevel());
-
-
-            if (robot.colorSensor.red() > robot.colorSensor.blue()) {
-                robot.buttonServo.setPosition(robot.RIGHT_BUTTON);
-                robot.rrMotor.setPower(-0.2);
-                robot.rlMotor.setPower(-0.2);
-                //Press Right Button
-            } else if (robot.colorSensor.blue() > robot.colorSensor.red()) {
-                robot.buttonServo.setPosition(robot.LEFT_BUTTON);
-                robot.rlMotor.setPower(-0.2);
-                robot.rrMotor.setPower(-0.2);
-                //Press Left Button
-            }
-
-            telemetry.update();
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+        while (opModeIsActive() && runtime.seconds() < 15) {
+            robot.rrMotor.setPower(-1.0);
+            robot.rlMotor.setPower(-1.0);
         }
-        //Turn towards Center Vortex and Go
-
-
-        //Drive until Ball is moved and Robot is on Center Vortex --> Stop
-
-        sleep(1000);
-        runtime.reset();
 
     }
 }

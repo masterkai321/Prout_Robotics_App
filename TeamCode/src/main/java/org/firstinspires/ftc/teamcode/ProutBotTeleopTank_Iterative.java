@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
@@ -67,6 +68,7 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
     double right;
     boolean pitcherIsRunning = false;
     boolean pitcherIsStopped = true;
+    ElapsedTime timer;
 
 
     /*
@@ -111,17 +113,9 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
             left = gamepad1.left_stick_y - gamepad1.right_stick_x;
             right = gamepad1.left_stick_y + gamepad1.right_stick_x;
         }
-
         robot.rrMotor.setPower(right);
         robot.rlMotor.setPower(left);
 
-        //Adjust Pitch Power with left and right D-Pad
-        if (gamepad1.dpad_left) {
-            robot.PITCH_POWER -= .05;
-        }
-        if (gamepad1.dpad_right) {
-            robot.PITCH_POWER += .05;
-        }
 
         //Use gamepad buttons to turn on brush (Left Bumper)
         if (gamepad1.left_bumper) {
@@ -134,21 +128,17 @@ public class ProutBotTeleopTank_Iterative extends OpMode{
 
         //Use gamepad buttons to move Button Servo to Left Beacon (X)
         if (gamepad1.x)
-            robot.buttonServo.setPosition(2.0);
+            robot.buttonServo.setPosition(robot.LEFT_BUTTON);
 
         //Use gamepad buttons to move Button Servo to Right Beacon (B)
         if (gamepad1.b)
-            robot.buttonServo.setPosition(-1.0);
+            robot.buttonServo.setPosition(robot.RIGHT_BUTTON);
 
-        //Use gamepad buttons to initiate toggle Pitch Motor (Right Bumper)
-        if (gamepad1.right_bumper && pitcherIsRunning) {
-            robot.pitchMotor.setPower(0.0);
-            pitcherIsRunning = false;
-            pitcherIsStopped = true;
-        } else if (gamepad1.right_bumper && pitcherIsStopped) {
+        //Use gamepad buttons to initiate toggle Pitch Motor (Up/Down DPad)
+        if (gamepad1.dpad_up) {
             robot.pitchMotor.setPower(robot.PITCH_POWER);
-            pitcherIsRunning = true;
-            pitcherIsStopped = false;
+        } else if (gamepad1.dpad_down) {
+            robot.pitchMotor.setPower(0.0);
         }
 
         //Use gamepad button to load particles into Pitcher (A)
